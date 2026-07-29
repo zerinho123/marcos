@@ -105,6 +105,12 @@ function actionOpensModal(action) {
 }
 
 // === Boot ===
+function failBoot(message) {
+  state.bootError = message;
+  state.ready = true;
+  renderApp();
+}
+
 async function boot() {
   const prefs = loadUiPrefs();
   if (prefs.activeNav) state.activeNav = prefs.activeNav;
@@ -137,7 +143,11 @@ async function boot() {
     // gestora da conta que ela estava comandando, silenciosamente.
     if (user.ambiente?.owner_id) {
       state.workspace = 'pessoal';
-      await applyAmbiente('pessoal', undefined, user.ambiente.owner_id);
+      const ambiente = await applyAmbiente('pessoal', undefined, user.ambiente.owner_id);
+      if (!ambiente) {
+        failBoot('Não foi possível confirmar o ambiente delegado. Recarregue a página.');
+        return;
+      }
     } else {
       // Ambiente inicial conforme o acesso do usuario (FinanceUser.workspaces):
       // 'pessoal'/'empresarial' travam no unico ambiente permitido; 'ambos'
@@ -159,7 +169,11 @@ async function boot() {
         state.activeEmpresaId = user.ambiente.empresa_id || state.activeEmpresaId;
         setActiveEmpresa(state.activeEmpresaId);
       } else {
-        await applyAmbiente(state.workspace, state.workspace === 'empresarial' ? state.activeEmpresaId : undefined);
+        const ambiente = await applyAmbiente(state.workspace, state.workspace === 'empresarial' ? state.activeEmpresaId : undefined);
+        if (!ambiente) {
+          failBoot('Não foi possível confirmar o ambiente ativo. Recarregue a página.');
+          return;
+        }
       }
     }
   } catch (err) {
@@ -169,9 +183,7 @@ async function boot() {
     }
     // Sem sessão por falha de conexão (rede/CORS/5xx): não adianta carregar dados.
     // Renderiza tela de erro com "Tentar novamente" em vez de girar pra sempre.
-    state.bootError = err?.message || 'Falha de conexão com o servidor.';
-    state.ready = true;
-    renderApp();
+    failBoot(err?.message || 'Falha de conexão com o servidor.');
     return;
   }
 
@@ -773,9 +785,13 @@ const ACTIONS = {
     document.body.classList.remove('nav-open');
     if (!isHybridUser()) return;
     const alvo = state.workspace === 'empresarial' ? 'pessoal' : 'empresarial';
+    const ambiente = await applyAmbiente(alvo, alvo === 'empresarial' ? state.activeEmpresaId : undefined);
+    if (!ambiente) {
+      pushToast('Não foi possível trocar de ambiente. Tente de novo.', 'error');
+      return; // state.workspace nunca mudou — nada na tela e alterado
+    }
     state.workspace = alvo;
     state.activeNav = 'dashboard';
-    await applyAmbiente(alvo, alvo === 'empresarial' ? state.activeEmpresaId : undefined);
     saveUiPrefs({ workspace: state.workspace, activeNav: state.activeNav });
     await refreshAll();
   },
@@ -784,9 +800,13 @@ const ACTIONS = {
   // pra propria conta; param = usuario_id de uma conta delegada.
   'trocar-usuario': async (param) => {
     document.body.classList.remove('nav-open');
+    const ambiente = await applyAmbiente('pessoal', undefined, param || undefined);
+    if (!ambiente) {
+      pushToast('Não foi possível trocar de conta. Tente de novo.', 'error');
+      return;
+    }
     state.workspace = 'pessoal';
     state.activeNav = 'dashboard';
-    await applyAmbiente('pessoal', undefined, param || undefined);
     try {
       const user = await me();
       if (user) state.currentUser = user;
