@@ -84,12 +84,24 @@ export function buildContasBancariasRouter({ poolRef = pool, queryFn = query, qu
       throw ERR.VALIDATION('Saldo nao pode ser editado diretamente. Registre um lancamento de ajuste.');
     }
     if (req.body.tipo) enumOr(req.body.tipo, TIPOS, 'tipo');
-    if (req.body.escopo) enumOr(req.body.escopo, ESCOPOS, 'escopo');
+    // Escopo NAO e mais editavel via body: a conta pertence ao ambiente em
+    // que nasceu. Antes, um body.escopo divergente do ambiente ativo mudava
+    // a conta de lado sem passar por resolveFinanceEscopo — numa empresa
+    // pessoal isso deixava a conta invisivel pra sempre (resolveAmbienteAlvo
+    // recusa empresa pessoal como ambiente empresarial). A trava antiga so
+    // valia com vinculos_count > 0; conta nova mudava de ambiente sem
+    // resistencia (2026-07 — ver auditoria de isolamento).
+    if (req.body.escopo != null) {
+      enumOr(req.body.escopo, ESCOPOS, 'escopo');
+      if (req.body.escopo !== resolveFinanceEscopo(req)) {
+        throw ERR.VALIDATION('Ambiente da conta nao pode ser alterado. Crie outra conta no ambiente desejado.');
+      }
+    }
     // moeda só é validada/atualizada se enviada (COALESCE mantém a atual).
     const moeda = (req.body.moeda == null || req.body.moeda === '') ? null : parseMoeda(req.body.moeda);
-    if (moeda || req.body.escopo) {
+    if (moeda) {
       const atual = await queryOneFn(
-        `SELECT cb.\`moeda\`, cb.\`escopo\`,
+        `SELECT cb.\`moeda\`,
                 ((SELECT COUNT(*) FROM \`FinTransacao\` t WHERE t.\`conta_bancaria_id\` = cb.\`id\` AND t.\`empresa_id\` = cb.\`empresa_id\`) +
                  (SELECT COUNT(*) FROM \`FinContaPagar\` cp WHERE cp.\`conta_bancaria_id\` = cb.\`id\` AND cp.\`empresa_id\` = cb.\`empresa_id\`) +
                  (SELECT COUNT(*) FROM \`FinContaReceber\` cr WHERE cr.\`conta_bancaria_id\` = cb.\`id\` AND cr.\`empresa_id\` = cb.\`empresa_id\`)) AS vinculos_count
@@ -98,24 +110,22 @@ export function buildContasBancariasRouter({ poolRef = pool, queryFn = query, qu
         [req.params.id, empresaId]
       );
       if (!atual) throw ERR.NOT_FOUND('Conta nao encontrada.');
-      const mudaMoeda = moeda && moeda !== String(atual.moeda || 'BRL').toUpperCase();
-      const mudaEscopo = req.body.escopo && req.body.escopo !== atual.escopo;
-      if (Number(atual.vinculos_count || 0) > 0 && (mudaMoeda || mudaEscopo)) {
-        throw ERR.VALIDATION('Moeda e ambiente nao podem mudar depois que a conta possui historico. Crie outra conta.');
+      const mudaMoeda = moeda !== String(atual.moeda || 'BRL').toUpperCase();
+      if (Number(atual.vinculos_count || 0) > 0 && mudaMoeda) {
+        throw ERR.VALIDATION('Moeda nao pode mudar depois que a conta possui historico. Crie outra conta.');
       }
     }
     const r = await queryFn(
       `UPDATE \`FinContaBancaria\`
           SET \`nome\`   = COALESCE(?, \`nome\`),
               \`tipo\`   = COALESCE(?, \`tipo\`),
-              \`escopo\` = COALESCE(?, \`escopo\`),
               \`moeda\`  = COALESCE(?, \`moeda\`),
               \`cor\`    = COALESCE(?, \`cor\`),
               \`ativo\`  = COALESCE(?, \`ativo\`),
               \`updatedAt\` = NOW(3)
         WHERE \`id\` = ? AND \`empresa_id\` = ?`,
       [
-        req.body.nome ?? null, req.body.tipo ?? null, req.body.escopo ?? null,
+        req.body.nome ?? null, req.body.tipo ?? null,
         moeda,
         req.body.cor ?? null,
         req.body.ativo == null ? null : (req.body.ativo ? 1 : 0),

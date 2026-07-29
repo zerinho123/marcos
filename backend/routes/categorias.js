@@ -263,9 +263,16 @@ export function buildCategoriasRouter({ poolRef = pool, queryFn = query, queryOn
     const tail = [req.params.id, empresaId];
     if (!isAdmin) { where += ' AND (`user_id` = ? OR `user_id` IS NULL)'; tail.push(userId); }
 
-    // Mantém `escopo` em sincronia com `tipo` quando este vier pessoal|empresarial
-    // (categoria não cruza escopo; `ambos` não é mais aceito como destino).
-    const escopoSync = ['pessoal', 'empresarial'].includes(req.body.tipo) ? req.body.tipo : null;
+    // Escopo NAO e editavel via body.tipo: categoria pertence ao ambiente em
+    // que nasceu. Antes, `escopoSync` espelhava qualquer `tipo` recebido e
+    // migrava a categoria de ambiente sem passar por resolveFinanceEscopo —
+    // numa empresa pessoal isso a tornava invisivel pra sempre. Se o body
+    // pedir um `tipo` que muda o ambiente, rejeita; front deve criar outra
+    // categoria (2026-07 — ver auditoria de isolamento).
+    if (['pessoal', 'empresarial'].includes(req.body.tipo) && req.body.tipo !== resolveFinanceEscopo(req)) {
+      throw ERR.VALIDATION('Ambiente da categoria nao pode ser alterado. Crie outra categoria no ambiente desejado.');
+    }
+    const escopoSync = null;
     const r = await queryFn(
       `UPDATE \`FinCategoria\`
           SET \`nome\`          = COALESCE(?, \`nome\`),

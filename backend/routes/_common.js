@@ -75,7 +75,12 @@ export function wrap(fn) {
 export function resolveFinanceEmpresa(req, candidate = null) {
   const user = req.financeUser;
   if (!user) throw ERR.UNAUTHENTICATED();
-  const requested = user.role === 'admin'
+  // Ambiente explicito (POST /auth/ambiente ja rodou nesta sessao) e a fonte
+  // da verdade: nem admin fura. Sem isso, um empresa_id desatualizado vindo
+  // do front (ex.: activeEmpresaId setado no boot, antes da troca de
+  // ambiente) sobrepunha a empresa da sessao e gravava dado no par
+  // empresa/escopo errado (2026-07 — ver auditoria de isolamento).
+  const requested = (user.role === 'admin' && !user.ambiente_explicito)
     ? (candidate ?? req.query?.empresa_id ?? req.body?.empresa_id ?? user.empresa_id)
     : user.empresa_id;
   if (!requested) {

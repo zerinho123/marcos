@@ -122,7 +122,12 @@ async function boot() {
     state.currentUser = user;
     // Empresa ativa: sempre a empresa "dona" do usuario (sem seletor na UI).
     state.activeEmpresaId = user.empresa_id || null;
-    setActiveEmpresa(state.activeEmpresaId);
+    // NAO chama setActiveEmpresa ainda: esse valor e sempre a empresa NORMAL,
+    // e ate aqui o ambiente ainda nao foi resolvido no backend (pode ser
+    // Pessoal). Injetar isso em apiFetch antes do applyAmbiente abaixo fazia
+    // requests irem com empresa_id da empresa normal + escopo pessoal — par
+    // que nenhuma tela consegue ler de volta. setActiveEmpresa so roda
+    // dentro de applyAmbiente(), com o empresa_id que o backend confirmou.
 
     // Ambiente delegado (gestor comandando a conta Pessoal de terceiro — ver
     // painel lateral): o cookie da sessao pode ja carregar essa claim de uma
