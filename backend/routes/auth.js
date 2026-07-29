@@ -177,7 +177,26 @@ export function buildAuthRouter({
         throw ERR.INVALID_CREDS();
       }
 
-      const { accessToken } = issueFinanceSession(row);
+      // Resolve o ambiente inicial ANTES de emitir a sessao, pra sessao nunca
+      // sair do login sem ambiente_tipo definido (a janela entre o login e o
+      // primeiro POST /auth/ambiente e o que deixava rotas exclusivamente
+      // empresariais abertas pra um usuario workspaces='pessoal' — ver
+      // docs/PLANO-CF-FINANCE-ISOLAMENTO.md, Fase 2). resolveAmbienteAlvo
+      // agora valida vinculo ativo em FinanceUserEmpresa (coisa que o login
+      // nunca fez) — se isso falhar por inconsistencia de dado, NAO bloqueia
+      // o login: cai pro fallback baseado em workspaces em financeAuth.js.
+      const tipoInicial = row.workspaces === 'empresarial' ? 'empresarial' : 'pessoal';
+      let alvo = null;
+      try {
+        alvo = await resolveAmbienteAlvo(
+          { id: row.id, nome: row.nome, empresa_id: row.empresa_id, role: row.role },
+          { tipo: tipoInicial, empresa_id: row.empresa_id }
+        );
+      } catch {
+        // Vinculo inconsistente/ausente: login segue sem ambiente explicito.
+      }
+
+      const { accessToken } = issueFinanceSession(row, alvo);
       setFinanceAuthCookie(res, accessToken);
 
       const csrfToken = buildFinanceCsrfToken({ userId: row.id });
@@ -194,7 +213,7 @@ export function buildAuthRouter({
         action: 'login_ok', user_id: row.id, username: row.username,
         role: row.role, empresa_id: row.empresa_id ?? null, status_code: 200
       });
-      return res.json({ ok: true, user: serializeUser(row), csrf_token: csrfToken });
+      return res.json({ ok: true, user: serializeUser(row), ambiente: alvo, csrf_token: csrfToken });
     } catch (e) { next(e); }
   });
 
@@ -263,6 +282,11 @@ export function buildAuthRouter({
         ambiente: {
           tipo: req.financeUser.ambiente_tipo,
           empresa_id: req.financeUser.empresa_id,
+          // true so quando a sessao passou por uma resolucao explicita de
+          // ambiente (login com vinculo ok, ou POST /auth/ambiente) — o
+          // frontend usa isto pra decidir se pode confiar neste valor sem
+          // reconfirmar com o backend (ver app-hotfix.js boot()).
+          explicito: req.financeUser.ambiente_explicito,
           // Presentes so quando o ambiente pessoal ativo e delegado (gestor
           // comandando a conta de terceiro) — ver security/ambiente.js.
           owner_id: req.financeUser.delegado ? req.financeUser.pessoal_owner_id : null,

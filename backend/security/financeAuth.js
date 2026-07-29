@@ -232,7 +232,8 @@ export function buildRequireFinanceAuth({ lookupFinanceUser, logger, assertDeleg
         access_level: ['admin', 'dono'].includes(user.role) ? 'operacao' : (user.access_level || 'operacao'),
         empresa_id: empresaAtiva,
         empresa_id_home: user.empresa_id ?? null,
-        ambiente_tipo: payload.ambiente_tipo ?? 'empresarial',
+        ambiente_tipo: payload.ambiente_tipo
+          ?? (user.workspaces === 'empresarial' ? 'empresarial' : 'pessoal'),
         // true somente quando o usuario passou pelo POST /auth/ambiente nesta
         // sessao — tokens legados (sem claim) mantem o comportamento antigo.
         ambiente_explicito: payload.ambiente_tipo != null,

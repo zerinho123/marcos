@@ -151,7 +151,16 @@ async function boot() {
       // resolvido acima. Sem isso, a sessao continua no default do backend
       // (empresa "dona", empresarial) mesmo que a UI mostre Pessoal — dessincronia
       // silenciosa de contexto entre o que o front pede e o que o back serve.
-      await applyAmbiente(state.workspace, state.workspace === 'empresarial' ? state.activeEmpresaId : undefined);
+      // Se o login (Fase 2) ja resolveu e confirmou esse mesmo ambiente, pula o
+      // POST /auth/ambiente redundante. `explicito` distingue "sessao resolvida
+      // de verdade" do fallback (vinculo inconsistente no login) — no fallback
+      // cai no applyAmbiente de sempre, que tambem auto-corrige o vinculo.
+      if (user.ambiente?.explicito && user.ambiente.tipo === state.workspace) {
+        state.activeEmpresaId = user.ambiente.empresa_id || state.activeEmpresaId;
+        setActiveEmpresa(state.activeEmpresaId);
+      } else {
+        await applyAmbiente(state.workspace, state.workspace === 'empresarial' ? state.activeEmpresaId : undefined);
+      }
     }
   } catch (err) {
     if (err.status === 401) {
