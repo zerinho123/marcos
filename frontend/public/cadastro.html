@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta name="theme-color" content="#0a1424" />
+    <title>CF Finance | Criar conta</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script src="./config.js"></script>
+    <link rel="stylesheet" href="./design-system.css?v=20260727-finance-v87" />
+    <style>
+      .login-wrap {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+
+      .login-brand {
+        position: relative;
+        overflow: hidden;
+        padding: 48px 56px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background:
+          radial-gradient(120% 80% at 0% 0%, rgba(34,211,238,0.16) 0%, transparent 55%),
+          radial-gradient(100% 90% at 100% 100%, rgba(74,222,128,0.10) 0%, transparent 50%),
+          linear-gradient(160deg, #0c1a30 0%, #081320 100%);
+        border-right: 1px solid var(--b1);
+      }
+      .brand-top, .brand-mid, .brand-bottom { position: relative; z-index: 1; }
+      .brand-logo {
+        display: inline-flex; align-items: center; gap: 11px;
+        font-family: var(--font-head); font-weight: 700; font-size: 17px; color: var(--t0);
+      }
+      .brand-logo .sidebar-logo-mark { width: 34px; height: 34px; font-size: 13px; }
+
+      .brand-headline {
+        font-family: var(--font-head);
+        font-size: clamp(24px, 2.6vw, 32px);
+        line-height: 1.18; font-weight: 600; letter-spacing: -0.02em;
+        color: var(--t0); max-width: 18ch;
+      }
+      .brand-foot { color: var(--t2); font-size: 11.5px; }
+
+      .login-form-side {
+        display: grid; place-items: center; padding: 32px;
+        background:
+          radial-gradient(90% 60% at 80% 0%, rgba(34,211,238,0.05) 0%, transparent 60%),
+          var(--bg);
+      }
+      .login-card {
+        width: 100%; max-width: 420px;
+        background: var(--s1);
+        border: 1px solid var(--b2);
+        border-radius: var(--r-xl);
+        padding: 34px 32px;
+        box-shadow: 0 24px 70px rgba(2,10,28,0.55);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      }
+      .login-card h1 {
+        font-family: var(--font-head); font-size: 22px; font-weight: 600;
+        color: var(--t0); letter-spacing: -0.01em; margin-bottom: 6px;
+      }
+      .register-sub { color: var(--t2); font-size: 12.5px; margin-bottom: 20px; line-height: 1.45; }
+
+      .pw-field { position: relative; }
+      .pw-toggle {
+        position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+        height: 30px; padding: 0 10px; border-radius: 7px;
+        background: transparent; border: none; color: var(--t2);
+        font-size: 11px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer;
+        text-transform: uppercase; transition: color var(--t-fast);
+      }
+      .pw-toggle:hover { color: var(--accent); }
+      .pw-field .input { padding-right: 62px; }
+
+      .pw-hint { color: var(--t2); font-size: 11.5px; margin-top: 4px; }
+
+      .login-submit { margin-top: 20px; width: 100%; height: 46px; font-size: 14px; }
+      .login-submit .loading { width: 16px; height: 16px; border-width: 2px; }
+
+      .login-error {
+        margin-bottom: 16px; padding: 10px 13px; border-radius: var(--r);
+        background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bdr);
+        font-size: 12.5px; line-height: 1.4;
+      }
+
+      .register-success {
+        text-align: center; padding: 12px 0 4px;
+      }
+      .register-success .ok-mark {
+        width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%;
+        display: grid; place-items: center; font-size: 24px;
+        background: var(--green-bg, rgba(74,222,128,0.12)); color: var(--green, #4ade80);
+        border: 1px solid var(--green-bdr, rgba(74,222,128,0.35));
+      }
+      .register-success h2 { font-family: var(--font-head); font-size: 18px; color: var(--t0); margin-bottom: 8px; }
+      .register-success p { color: var(--t1); font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
+
+      .back-login {
+        display: block; text-align: center; margin-top: 16px;
+        color: var(--t2); font-size: 12.5px; text-decoration: none;
+      }
+      .back-login:hover { color: var(--accent); }
+
+      .mobile-logo { display: none; }
+
+      @media (max-width: 880px) {
+        .login-wrap { grid-template-columns: 1fr; }
+        .login-brand { display: none; }
+        .login-form-side { min-height: 100vh; padding: 24px; }
+        .mobile-logo {
+          display: inline-flex; align-items: center; gap: 10px; justify-content: center;
+          margin-bottom: 22px; font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--t0);
+        }
+      }
+
+      @media (max-width: 520px) {
+        .login-form-side {
+          min-height: 100dvh;
+          padding: 16px;
+          place-items: stretch;
+          align-content: center;
+        }
+        .login-card { max-width: none; padding: 24px 18px; border-radius: 14px; }
+        .login-card h1 { font-size: 20px; }
+        .mobile-logo { justify-content: flex-start; margin-bottom: 18px; }
+        .input { font-size: 16px; }
+      }
+    </style>
+    <link rel="stylesheet" href="./ui-foundation.css?v=20260720-finance-v83" />
+  </head>
+  <body>
+    <main class="login-wrap">
+      <section class="login-brand">
+        <div class="brand-top">
+          <span class="brand-logo">
+            <span class="sidebar-logo-mark">CF</span> CF Finance
+          </span>
+        </div>
+
+        <div class="brand-mid">
+          <h2 class="brand-headline">Peça seu acesso ao CF Finance.</h2>
+        </div>
+
+        <div class="brand-bottom">
+          <p class="brand-foot">© <span id="yr">2026</span> CF Sistema · financeiro.cfsistema.site</p>
+        </div>
+      </section>
+
+      <section class="login-form-side">
+        <div class="login-card">
+          <span class="mobile-logo"><span class="sidebar-logo-mark">CF</span> CF Finance</span>
+
+          <div id="register-panel">
+            <h1>Criar conta</h1>
+            <p class="register-sub">Preencha seus dados. Um administrador revisa e aprova o cadastro — você recebe o acesso assim que for liberado.</p>
+
+            <div id="register-error-slot"></div>
+
+            <form id="register-form" autocomplete="on" novalidate>
+              <label class="field">
+                <span class="field-label">Nome completo</span>
+                <input class="input" name="nome" required autocomplete="name" placeholder="Seu nome" autofocus />
+              </label>
+
+              <label class="field">
+                <span class="field-label">E-mail</span>
+                <input class="input" name="email" required type="email" autocomplete="email" placeholder="voce@exemplo.com" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Telefone / WhatsApp</span>
+                <input class="input" name="telefone" required type="tel" autocomplete="tel"
+                       inputmode="tel" placeholder="(00) 90000-0000" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">CPF / CNPJ</span>
+                <input class="input" name="documento" required autocomplete="off"
+                       inputmode="numeric" placeholder="Somente números ou com pontuação" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Empresa</span>
+                <input class="input" name="empresa" required autocomplete="organization"
+                       placeholder="Nome da sua empresa" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Plano / valor <span style="color:var(--t2);font-weight:400;">(opcional)</span></span>
+                <input class="input" name="plano" autocomplete="off" placeholder="Ex.: Mensal · R$ 99" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Usuário</span>
+                <input class="input" name="username" required autocomplete="username"
+                       placeholder="seu.usuario" pattern="[a-z0-9._-]{3,64}" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">Senha</span>
+                <span class="pw-field">
+                  <input class="input" name="password" required type="password"
+                         autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8" />
+                  <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Mostrar senha">Mostrar</button>
+                </span>
+                <span class="pw-hint">Ao menos 8 caracteres, com letra e número.</span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Confirmar senha</span>
+                <input class="input" name="password2" required type="password"
+                       autocomplete="new-password" placeholder="Repita a senha" minlength="8" />
+              </label>
+
+              <button type="submit" class="btn btn-primary login-submit" id="register-submit">Enviar cadastro &rarr;</button>
+            </form>
+          </div>
+
+          <div id="register-done" class="register-success" hidden>
+            <div class="ok-mark">✓</div>
+            <h2>Cadastro enviado!</h2>
+            <p>Seu pedido foi registrado e está aguardando aprovação de um administrador.<br />Quando for aprovado, é só entrar com seu usuário e senha.</p>
+            <a class="btn btn-primary login-submit" href="./login.html" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">Ir para o login</a>
+          </div>
+
+          <a class="back-login" href="./login.html">&larr; Já tenho conta — entrar</a>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./cadastro-boot.js?v=20260727-finance-v87"></script>
+  </body>
+</html>

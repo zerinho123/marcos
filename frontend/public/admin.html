@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta name="theme-color" content="#06111f" />
+    <title>CF Finance | Admin</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script src="./config.js"></script>
+    <link rel="stylesheet" href="./design-system.css?v=20260727-finance-v87" />
+    <link rel="stylesheet" href="./admin.css?v=20260720-admin-v18" />
+    <link rel="stylesheet" href="./ui-foundation.css?v=20260720-finance-v83" />
+  </head>
+  <body>
+    <div id="admin-root">
+      <main class="admin-state" aria-live="polite">
+        <span class="admin-spinner" aria-hidden="true"></span>
+        <p>Carregando painel administrativo...</p>
+      </main>
+    </div>
+    <div id="modal-root"></div>
+    <div id="toast-root" class="toast-stack"></div>
+    <script type="module" src="./admin.js?v=20260720-admin-v18"></script>
+  </body>
+</html>

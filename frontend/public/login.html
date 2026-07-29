@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta name="theme-color" content="#0a1424" />
+    <title>CF Finance | Entrar</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script src="./config.js"></script>
+    <link rel="stylesheet" href="./design-system.css?v=20260727-finance-v87" />
+    <style>
+      body { overflow: hidden; }
+      .login-wrap {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+
+      .login-brand {
+        position: relative;
+        overflow: hidden;
+        padding: 48px 56px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background:
+          radial-gradient(120% 80% at 0% 0%, rgba(34,211,238,0.16) 0%, transparent 55%),
+          radial-gradient(100% 90% at 100% 100%, rgba(74,222,128,0.10) 0%, transparent 50%),
+          linear-gradient(160deg, #0c1a30 0%, #081320 100%);
+        border-right: 1px solid var(--b1);
+      }
+      .brand-top, .brand-mid, .brand-bottom { position: relative; z-index: 1; }
+      .brand-logo {
+        display: inline-flex; align-items: center; gap: 11px;
+        font-family: var(--font-head); font-weight: 700; font-size: 17px; color: var(--t0);
+      }
+      .brand-logo .sidebar-logo-mark { width: 34px; height: 34px; font-size: 13px; }
+
+      .brand-headline {
+        font-family: var(--font-head);
+        font-size: clamp(24px, 2.6vw, 32px);
+        line-height: 1.18; font-weight: 600; letter-spacing: -0.02em;
+        color: var(--t0); max-width: 18ch;
+      }
+      .brand-foot { color: var(--t2); font-size: 11.5px; }
+
+      .login-form-side {
+        display: grid; place-items: center; padding: 32px;
+        background:
+          radial-gradient(90% 60% at 80% 0%, rgba(34,211,238,0.05) 0%, transparent 60%),
+          var(--bg);
+      }
+      .login-card {
+        width: 100%; max-width: 384px;
+        background: var(--s1);
+        border: 1px solid var(--b2);
+        border-radius: var(--r-xl);
+        padding: 34px 32px;
+        box-shadow: 0 24px 70px rgba(2,10,28,0.55);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      }
+      .login-card h1 {
+        font-family: var(--font-head); font-size: 22px; font-weight: 600;
+        color: var(--t0); letter-spacing: -0.01em; margin-bottom: 22px;
+      }
+
+      .pw-field { position: relative; }
+      .pw-toggle {
+        position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+        height: 30px; padding: 0 10px; border-radius: 7px;
+        background: transparent; border: none; color: var(--t2);
+        font-size: 11px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer;
+        text-transform: uppercase; transition: color var(--t-fast);
+      }
+      .pw-toggle:hover { color: var(--accent); }
+      .pw-field .input { padding-right: 62px; }
+
+      .login-submit {
+        margin-top: 20px; width: 100%; height: 46px; font-size: 14px;
+      }
+      .login-submit .loading { width: 16px; height: 16px; border-width: 2px; }
+
+      .remember-login {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 2px;
+        padding: 10px 12px;
+        border: 1px solid var(--b1);
+        border-radius: var(--r);
+        background: rgba(255,255,255,0.025);
+        color: var(--t1);
+        font-size: 12.5px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .remember-login input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent);
+        flex: 0 0 auto;
+      }
+
+      .login-error {
+        margin-bottom: 16px; padding: 10px 13px; border-radius: var(--r);
+        background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bdr);
+        font-size: 12.5px; line-height: 1.4;
+      }
+
+      .register-link {
+        display: block; text-align: center; margin-top: 16px;
+        color: var(--t2); font-size: 12.5px; text-decoration: none;
+      }
+      .register-link strong { color: var(--accent); font-weight: 600; }
+      .register-link:hover strong { text-decoration: underline; }
+
+      .mobile-logo { display: none; }
+
+      @media (max-width: 880px) {
+        body { overflow: auto; }
+        .login-wrap { grid-template-columns: 1fr; }
+        .login-brand { display: none; }
+        .login-form-side { min-height: 100vh; padding: 24px; }
+        .mobile-logo {
+          display: inline-flex; align-items: center; gap: 10px; justify-content: center;
+          margin-bottom: 22px; font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--t0);
+        }
+      }
+
+      @media (max-width: 520px) {
+        .login-form-side {
+          min-height: 100dvh;
+          padding: 16px;
+          place-items: stretch;
+          align-content: center;
+        }
+        .login-card {
+          max-width: none;
+          padding: 24px 18px;
+          border-radius: 14px;
+        }
+        .login-card h1 { font-size: 20px; margin-bottom: 18px; }
+        .mobile-logo { justify-content: flex-start; margin-bottom: 18px; }
+        .input { font-size: 16px; }
+      }
+    </style>
+    <link rel="stylesheet" href="./ui-foundation.css?v=20260720-finance-v83" />
+  </head>
+  <body>
+    <main class="login-wrap">
+      <section class="login-brand">
+        <div class="brand-top">
+          <span class="brand-logo">
+            <span class="sidebar-logo-mark">CF</span> CF Finance
+          </span>
+        </div>
+
+        <div class="brand-mid">
+          <h2 class="brand-headline">Controle financeiro pessoal e empresarial.</h2>
+        </div>
+
+        <div class="brand-bottom">
+          <p class="brand-foot">© <span id="yr">2026</span> CF Sistema · financeiro.cfsistema.site</p>
+        </div>
+      </section>
+
+      <section class="login-form-side">
+        <div class="login-card">
+          <span class="mobile-logo"><span class="sidebar-logo-mark">CF</span> CF Finance</span>
+          <h1>Entrar</h1>
+
+          <div id="auth-error-slot"></div>
+
+          <form id="auth-form" class="auth-form" autocomplete="on" novalidate>
+            <label class="field">
+              <span class="field-label">Usuário</span>
+              <input class="input" name="username" required autocomplete="username"
+                     placeholder="seu.usuario" autofocus />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Senha</span>
+              <span class="pw-field">
+                <input class="input" name="password" required type="password"
+                       autocomplete="current-password" placeholder="Sua senha" />
+                <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Mostrar senha">Mostrar</button>
+              </span>
+            </label>
+
+            <label class="remember-login" for="remember-login">
+              <span>Salvar login neste aparelho</span>
+              <input type="checkbox" id="remember-login" name="remember_login" />
+            </label>
+
+            <button type="submit" class="btn btn-primary login-submit" id="auth-submit">Entrar &rarr;</button>
+          </form>
+
+          <a class="register-link" href="./cadastro.html">Não tem conta? <strong>Pedir acesso</strong></a>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./login-boot.js?v=20260727-finance-v87"></script>
+  </body>
+</html>

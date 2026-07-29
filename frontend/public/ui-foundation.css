@@ -1,0 +1,768 @@
+/* ============================================================================
+   ui-foundation.css - camada canonica de layout e responsividade do CF Finance
+   Carregada por ultimo em todas as superficies para unificar regras legadas.
+   ============================================================================ */
+
+:root {
+  --ui-content-max: 1600px;
+  --ui-gutter: clamp(14px, 2.2vw, 32px);
+  --ui-panel-radius: 14px;
+  --ui-control-radius: 9px;
+  --ui-dialog-radius: 18px;
+  --ui-control-height: 40px;
+  --ui-touch-height: 44px;
+  --ui-panel-bg: rgba(13, 26, 46, 0.84);
+  --ui-focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.24);
+}
+
+html {
+  min-width: 320px;
+  scrollbar-gutter: stable;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+  overflow-x: clip;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+.btn,
+.admin-btn,
+.admin-icon-btn,
+.admin-icon-action,
+.admin-nav-item,
+a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: var(--ui-focus-ring);
+}
+
+:where(h1, h2, h3, .page-title, .modal-title, .admin-page-head h1, .admin-modal-head h2) {
+  font-family: var(--font-head);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+:where(p, .page-subtitle, .muted, .hint) {
+  text-wrap: pretty;
+}
+
+/* Shell e cabecalhos ------------------------------------------------------- */
+.app-shell {
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+}
+
+.app-main {
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+}
+
+.app-content {
+  container: app-content / inline-size;
+  width: 100%;
+  max-width: var(--ui-content-max);
+  min-width: 0;
+  padding: var(--ui-gutter);
+}
+
+.page-section {
+  width: 100%;
+  min-width: 0;
+  padding-block: clamp(14px, 1.8vw, 24px);
+}
+
+.page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px 24px;
+  margin-bottom: clamp(18px, 2.2vw, 28px);
+}
+
+.page-header > div:first-child {
+  min-width: 0;
+}
+
+.page-title,
+.page-header h1 {
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 650;
+  line-height: 1.08;
+}
+
+.page-subtitle {
+  max-width: 72ch;
+  margin-top: 6px;
+  color: var(--t1);
+  line-height: 1.45;
+}
+
+.page-actions {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.topbar {
+  min-width: 0;
+  padding-inline: var(--ui-gutter);
+}
+
+.topbar-left,
+.topbar-right,
+.topbar-empresa {
+  min-width: 0;
+}
+
+/* Componentes base -------------------------------------------------------- */
+.btn,
+.admin-btn,
+.admin-icon-action,
+.admin-page-btn {
+  min-height: var(--ui-control-height);
+  height: auto;
+  border-radius: var(--ui-control-radius);
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+.btn {
+  padding-block: 8px;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding-block: 6px;
+}
+
+.btn-icon,
+.admin-icon-btn {
+  min-width: var(--ui-control-height);
+  min-height: var(--ui-control-height);
+}
+
+.card,
+.kpi-card,
+.debt-card,
+.admin-kpi,
+.admin-panel {
+  min-width: 0;
+  border-radius: var(--ui-panel-radius);
+}
+
+.card {
+  padding: clamp(16px, 1.6vw, 22px);
+  background: var(--ui-panel-bg);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.025), 0 12px 34px rgba(2, 10, 28, 0.2);
+}
+
+.card::before {
+  opacity: 0.18;
+}
+
+.card-header,
+.admin-panel-head {
+  gap: 12px;
+}
+
+.input,
+.select,
+.textarea,
+.admin-search input,
+.admin-select,
+.admin-field input,
+.admin-field select,
+.admin-multiselect input[type="search"] {
+  min-height: var(--ui-control-height);
+  border-radius: var(--ui-control-radius);
+}
+
+.field-row,
+.admin-form-grid {
+  align-items: start;
+}
+
+.empty-state,
+.admin-empty,
+.admin-state,
+.admin-denied {
+  min-width: 0;
+}
+
+/* Dados densos: o conteudo rola dentro do proprio painel, nunca a pagina. */
+.table-scroll,
+.admin-table-wrap,
+.dre-card,
+.pricing-table-card {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table,
+.admin-table {
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th,
+.data-table td,
+.admin-table th,
+.admin-table td {
+  vertical-align: middle;
+}
+
+.row-actions,
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Modais ------------------------------------------------------------------ */
+.modal-backdrop,
+.admin-modal-backdrop,
+.admin-confirm-layer {
+  padding: clamp(8px, 2vw, 24px);
+}
+
+.modal-card,
+.admin-modal {
+  width: min(680px, calc(100vw - 32px));
+  max-width: 100%;
+  max-height: calc(100dvh - 32px);
+  border-radius: var(--ui-dialog-radius);
+}
+
+.modal-body,
+.admin-modal-content {
+  min-width: 0;
+  overscroll-behavior: contain;
+}
+
+.modal-footer,
+.admin-modal-foot {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Dashboard e relatorios -------------------------------------------------- */
+.dash-mod-grid,
+.dashboard-grid,
+.kpi-grid,
+.kpi-grid-rich,
+.grid-2,
+.grid-2-equal,
+.grid-2col,
+.grid-3col,
+.debt-grid {
+  min-width: 0;
+}
+
+.dash-widget,
+.dash-widget-body,
+.dash-widget-body > * {
+  min-width: 0;
+}
+
+.dash-cambio-form,
+.dash-cambio-breakdown,
+.dash-cambio-metrics {
+  min-width: 0;
+}
+
+/* Paginas publicas -------------------------------------------------------- */
+.login-card,
+.lp-card,
+.lp-step,
+.lp-final {
+  border-radius: var(--ui-panel-radius);
+  box-shadow: 0 18px 54px rgba(2, 10, 28, 0.28);
+}
+
+.login-card {
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.lp-shell {
+  width: min(100% - 32px, 1180px);
+  padding-inline: 0;
+}
+
+.lp-nav {
+  gap: 16px;
+}
+
+.lp-nav-actions,
+.lp-cta-row {
+  min-width: 0;
+}
+
+/* Quebra a grade tripla generica da landing sem alterar a semantica. */
+@media (min-width: 821px) {
+  .lp-grid,
+  .lp-steps {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .lp-grid > :nth-child(1),
+  .lp-steps > :nth-child(1) { grid-column: span 5; }
+
+  .lp-grid > :nth-child(2),
+  .lp-steps > :nth-child(2) { grid-column: span 4; }
+
+  .lp-grid > :nth-child(3),
+  .lp-steps > :nth-child(3) { grid-column: span 3; }
+}
+
+/* Admin ------------------------------------------------------------------- */
+.admin-layout {
+  width: min(var(--ui-content-max), 100%);
+  padding: var(--ui-gutter);
+  gap: clamp(16px, 2vw, 24px);
+}
+
+.admin-main,
+.admin-page-head > div,
+.admin-toolbar,
+.admin-search {
+  min-width: 0;
+}
+
+.admin-page-head h1 {
+  font-size: clamp(26px, 3.2vw, 40px);
+  font-weight: 650;
+}
+
+.admin-page-actions {
+  min-width: 0;
+}
+
+/* Breakpoint de navegacao: tablet e notebook estreito. */
+@media (max-width: 960px) {
+  .app-shell,
+  .app-shell.has-userpanel,
+  .app-shell.has-userpanel.userpanel-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    min-width: var(--ui-touch-height);
+    min-height: var(--ui-touch-height);
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 200;
+    width: min(86vw, 320px);
+    height: 100dvh;
+    transform: translateX(-100%);
+  }
+
+  body.nav-open .sidebar {
+    transform: translateX(0);
+  }
+
+  body.nav-open .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(2, 8, 18, 0.72);
+  }
+
+  /* Painel "Contas que eu comando" vira gaveta sobreposta pela direita —
+     mesmo padrao do menu lateral, so que no lado oposto e com classe no
+     body propria (userpanel-open), independente do colapso de desktop. */
+  .userpanel {
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 200;
+    width: min(86vw, 300px);
+    height: 100dvh;
+    transform: translateX(100%);
+    transition: transform .2s ease;
+  }
+
+  body.userpanel-open .userpanel {
+    transform: translateX(0);
+  }
+
+  body.userpanel-open .userpanel-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(2, 8, 18, 0.72);
+  }
+
+  .grid-2,
+  .grid-2-equal,
+  .grid-2col,
+  .grid-3col,
+  .admin-grid-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Colapso do painel lateral so faz sentido como coluna estreita — em telas
+   largas o botao "Recolher" some com o conteudo; no mobile (gaveta acima) o
+   conteudo fica sempre completo, so a visibilidade muda. */
+@media (min-width: 961px) {
+  .userpanel.is-collapsed .userpanel-list,
+  .userpanel.is-collapsed .userpanel-title {
+    display: none;
+  }
+}
+
+/* Breakpoint de conteudo: celular e tablet vertical. */
+@media (max-width: 760px) {
+  :root {
+    --ui-gutter: 12px;
+  }
+
+  .page-section {
+    padding-block: 10px;
+  }
+
+  .page-header {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .page-title,
+  .page-header h1 {
+    font-size: clamp(23px, 7vw, 30px);
+  }
+
+  .page-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .page-actions .btn,
+  .page-actions > a {
+    width: 100%;
+    min-width: 0;
+    min-height: var(--ui-touch-height);
+    white-space: normal;
+  }
+
+  .dash-modular .page-actions {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .dash-modular .dash-periodo {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .dash-modular .dash-periodo .btn,
+  .dash-modular .page-actions > [data-action="dash-edit-toggle"],
+  .dash-modular .page-actions > [data-action="dash-add-toggle"],
+  .dash-modular .page-actions > [data-action="open-modal-transacao"] {
+    width: 100%;
+  }
+
+  .dash-modular .page-actions > [data-action="dash-edit-toggle"],
+  .dash-modular .page-actions > [data-action="dash-add-toggle"],
+  .dash-modular .page-actions > [data-action="open-modal-transacao"] {
+    grid-column: 1 / -1;
+  }
+
+  .topbar {
+    min-height: 58px;
+    height: auto;
+    align-items: center;
+    gap: 8px;
+    padding-block: 7px;
+  }
+
+  .topbar-right {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .topbar-right .btn,
+  .btn-sm,
+  .btn-icon,
+  .admin-icon-btn,
+  .admin-icon-action {
+    min-height: var(--ui-touch-height);
+  }
+
+  .btn-icon,
+  .admin-icon-btn {
+    min-width: var(--ui-touch-height);
+  }
+
+  .card,
+  .kpi-card,
+  .debt-card,
+  .admin-kpi,
+  .admin-panel,
+  .login-card,
+  .lp-card,
+  .lp-step,
+  .lp-final {
+    border-radius: 12px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .card-header,
+  .admin-panel-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .field-row,
+  .admin-form-grid,
+  .admin-toolbar,
+  .admin-toolbar-wide,
+  .admin-user-link-controls,
+  .pricing-toolbar,
+  .pricing-management-grid,
+  .pricing-grid-2,
+  .pricing-grid-3,
+  .pricing-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .input,
+  .select,
+  .textarea,
+  .admin-search input,
+  .admin-select,
+  .admin-field input,
+  .admin-field select {
+    min-height: var(--ui-touch-height);
+    font-size: 16px;
+  }
+
+  .modal-backdrop,
+  .admin-modal-backdrop,
+  .admin-confirm-layer {
+    align-items: stretch;
+    padding: 8px;
+  }
+
+  .modal-card,
+  .admin-modal {
+    width: 100%;
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer,
+  .admin-modal-head,
+  .admin-modal-content,
+  .admin-modal-foot {
+    padding-inline: 14px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    min-height: var(--ui-touch-height);
+    flex: 0 0 auto;
+  }
+
+  .admin-modal-foot .admin-btn {
+    min-height: var(--ui-touch-height);
+    flex: 1 1 148px;
+  }
+
+  .data-table {
+    min-width: 620px;
+  }
+
+  .dash-mod-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dash-widget,
+  .dash-widget-body,
+  .dash-widget-body > .card,
+  .dash-widget-body > .kpi-card {
+    height: auto;
+    min-height: 0;
+  }
+
+  .dash-widget-body {
+    overflow: visible;
+  }
+
+  .dash-cambio-breakdown {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-cambio-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-layout {
+    padding: var(--ui-gutter);
+  }
+
+  .admin-page-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-page-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .admin-page-actions .admin-btn {
+    width: 100%;
+    min-height: var(--ui-touch-height);
+  }
+
+  .login-form-side {
+    min-height: 100dvh;
+  }
+
+  .login-card {
+    width: min(100%, 460px);
+    max-height: none;
+  }
+
+  .lp-nav {
+    align-items: flex-start;
+  }
+
+  .lp-cta-row .btn {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --ui-gutter: 8px;
+  }
+
+  .topbar-left .page-subtitle,
+  .topbar-right .btn:not(.nav-toggle) {
+    display: none;
+  }
+
+  .card,
+  .kpi-card,
+  .debt-card,
+  .admin-kpi,
+  .admin-panel {
+    padding: 14px 12px;
+  }
+
+  .modal-backdrop,
+  .admin-modal-backdrop {
+    padding: 0;
+  }
+
+  .modal-card,
+  .admin-modal {
+    min-height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border-inline: 0;
+  }
+
+  .data-table {
+    min-width: 560px;
+  }
+
+  .lp-shell {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .lp-nav-actions .btn-secondary {
+    display: none;
+  }
+
+  .lp-nav-actions .btn,
+  .lp-cta-row .btn {
+    width: 100%;
+  }
+
+  .lp-nav-actions {
+    flex: 0 1 150px;
+  }
+
+  .lp-cta-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .login-form-side {
+    padding: 12px;
+  }
+
+  .login-card {
+    padding: 22px 18px;
+  }
+}
+
+@container app-content (max-width: 700px) {
+  .page-header {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .page-actions {
+    justify-content: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
