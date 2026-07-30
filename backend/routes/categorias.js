@@ -354,14 +354,14 @@ export function buildCategoriasRouter({ poolRef = pool, queryFn = query, queryOn
     const isAdmin = req.financeUser?.role === 'admin';
     let where = '`id` = ? AND `empresa_id` = ?';
     const tail = [req.params.id, empresaId];
-    if (!isAdmin) { where += ' AND (`user_id` = ? OR `user_id` IS NULL)'; tail.push(req.financeUser?.id ?? null); }
+    if (!isAdmin) { where += ' AND (`user_id` = ? OR `user_id` IS NULL)'; tail.push(personalUserId(req) || null); }
 
     const conn = await poolRef.getConnection();
     try {
       await conn.beginTransaction();
       const snapshot = await snapshotLinha(conn, 'FinCategoria', req.params.id, empresaId);
       if (!snapshot) throw ERR.NOT_FOUND('Categoria nao encontrada.');
-      if (!isAdmin && !(snapshot.user_id === (req.financeUser?.id ?? null) || snapshot.user_id == null)) {
+      if (!isAdmin && !(snapshot.user_id === (personalUserId(req) || null) || snapshot.user_id == null)) {
         throw ERR.NOT_FOUND('Categoria nao encontrada.');
       }
       const [r] = await conn.execute(`DELETE FROM \`FinCategoria\` WHERE ${where}`, tail);

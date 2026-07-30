@@ -10,12 +10,14 @@
 
 | Fase | Descrição | Status |
 |---|---|---|
-| 0 | Preparação (backup + baseline) | 🔲 pendente |
-| 1 | Fechar escritas que corrompem dado | ✅ **aplicada** — ver arquivos anexos `fase-1-arquivos-corrigidos.zip` |
-| 2 | Ambiente da sessão nunca fica indefinido | 🔲 pendente |
-| 3 | Falha de troca de ambiente vira erro visível | 🔲 pendente |
-| 4 | Backfill dos dados órfãos | 🔲 pendente (depende da 0 e 1) |
-| 5 | Delegação: PUT/DELETE de categoria | 🔲 pendente |
+| 0 | Preparação (backup + baseline) | 🟡 backup feito; deploy em produção ainda pendente |
+| 1 | Fechar escritas que corrompem dado | ✅ **aplicada** — commit `7fe7e1c` |
+| 2 | Ambiente da sessão nunca fica indefinido | ✅ **aplicada** — commit `14989d2` |
+| 3 | Falha de troca de ambiente vira erro visível | ✅ **aplicada** — commit `6482618` |
+| 4 | Backfill dos dados órfãos | 🔲 pendente — bloqueada até Fase 1 estar em produção há alguns dias (ver nota na seção da Fase 4) |
+| 5 | Delegação: PUT/DELETE de categoria | ✅ **aplicada** — ver nota na seção da Fase 5: bug já não existia no ramo pessoal, ramo empresarial ajustado por clareza (no-op comprovado) |
+
+Nenhuma destas fases foi deployada em produção ainda — o código está no branch `claude/session-yi1efo` (default do repo `zerinho123/marcos`).
 
 Trabalhe as fases nesta ordem. 1, 2, 3 e 5 são independentes entre si e podem entrar no mesmo deploy. A Fase 4 mexe em dado de produção — trate como operação isolada, com janela definida.
 
@@ -191,6 +193,8 @@ DevTools → Network → Offline durante o clique no toggle. A tela deve permane
 
 **Rollback:** restaurar o backup da Fase 0 caso algo saia errado durante o boot com a flag ligada.
 
+> **Nota (sessão de correção):** `backend/sql/007_relatorio_pessoal_multiusuario.sql` foi criado (não existia no repo, só era referenciado em comentário) — é a query de leitura do passo 4. Execução desta fase segue **bloqueada**: as Fases 1-3 ainda não foram deployadas em produção, então o pré-requisito acima não está satisfeito. Backup (Fase 0) já existe. Nenhuma flag foi ligada, nenhum banco de produção foi tocado.
+
 ---
 
 ## FASE 5 — Delegação: PUT/DELETE de categoria
@@ -216,6 +220,8 @@ A escrita continua barrada quando a delegação é só de leitura — `requireFi
 
 ### Teste de aceite
 Com uma delegação ativa (`operar`), gestor lista categorias do gerido, edita uma e confirma que não cai mais em 404.
+
+> **Nota (sessão de correção):** ao reler `categorias.js` inteiro para aplicar esta fase, o bug descrito acima **já não existia** no ramo pessoal — GET, POST, PUT e DELETE de `FinCategoriaPessoal` já usavam `personalUserId(req)` de forma consistente. O único lugar que ainda usava `req.financeUser?.id` era o ramo empresarial (`FinCategoria`) do DELETE, fora do `if (isPersonalRequest(req))` — mas esse ramo é inalcançável em contexto de delegação (`isPersonalRequest` sempre desvia antes, já que `FinanceDelegacao` só existe para o ambiente Pessoal), e o JWT garante `personalUserId(req) === req.financeUser.id` sempre que esse ramo roda. A troca foi aplicada mesmo assim ali, por clareza/defensivo — é comprovadamente um no-op hoje, não uma correção de comportamento.
 
 ---
 
